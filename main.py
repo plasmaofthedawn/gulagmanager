@@ -1,4 +1,5 @@
-import discord
+import discordbot
+import database
 import json
 import flask
 
@@ -6,6 +7,6 @@ import flask
 
 if __name__ == '__main__':
     secrets = json.load(open("secrets.json"))
-    client = discord.Client()
-
+    client = discordbot.GClient()
+    database.connect()
     client.run(secrets["discordtoken"])

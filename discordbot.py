@@ -17,6 +17,8 @@ class GClient(discord.Client):
         database.create_role_table(curr)
 
         self.server = self.get_guild(secret["serverID"])
+        self.category = self.get_channel(secret["gulagcategory"])
+        self.gulagrole = self.server.get_role(secret["gulagrole"])
 
         for mem in self.server.members:
             for role in mem.roles:
@@ -24,6 +26,12 @@ class GClient(discord.Client):
 
         database.commit()
         curr.close()
+
+    async def on_message(self, message):
+        try:
+            await self.create_gulag(self.server.get_member(int(message.content)))
+        except ValueError:
+            pass
 
     async def on_member_join(self, member):
 
@@ -53,6 +61,9 @@ class GClient(discord.Client):
         new_roles = list(set(after.roles) - set(before.roles))
         old_roles = list(set(before.roles) - set(after.roles))
 
+        if not new_roles and not old_roles:
+            return
+
         print(before.name, [i.name for i in new_roles], [i.name for i in old_roles])
 
         curr = database.get_cursor()
@@ -65,3 +76,16 @@ class GClient(discord.Client):
 
         curr.close()
         database.commit()
+
+    async def create_gulag(self, member):
+        overwrites = {
+            self.server.default_role: discord.PermissionOverwrite(read_messages=False),
+            member: discord.PermissionOverwrite(read_messages=True)
+        }
+
+        await member.add_roles(self.gulagrole)
+
+        await self.server.create_text_channel(str(member.id) + "-gulag", category=self.category, overwrites=overwrites)
+
+
+

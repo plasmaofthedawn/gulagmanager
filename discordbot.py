@@ -30,12 +30,6 @@ class GClient(discord.Client):
         database.commit()
         curr.close()
 
-    async def on_message(self, message):
-        try:
-            await self.create_gulag(self.server.get_member(int(message.content)))
-        except ValueError:
-            pass
-
     async def on_member_join(self, member):
 
         curr = database.get_cursor()

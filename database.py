@@ -67,7 +67,7 @@ class PostgreSQL:
 class MySQL:
 
     def __init__(self, credentials):
-        # logger.log('Connecting to the PostgreSQL database...')
+        # logger.log('Connecting to the MySQL database...')
         self.conn = MySQLdb.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
                                     db=credentials["database"])
 
@@ -85,8 +85,8 @@ class MySQL:
             """
             CREATE TABLE IF NOT EXISTS roles (
                 id serial PRIMARY KEY,
-                userid VARCHAR(10) NOT NULL,
-                roleid VARCHAR(10) NOT NULL
+                userid BIGINT NOT NULL,
+                roleid BIGINT NOT NULL
             )
             """
         )

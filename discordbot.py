@@ -15,9 +15,7 @@ class GClient(discord.Client):
 
         self.frozen_members = []
 
-        curr = database.get_cursor()
-
-        database.create_role_table(curr)
+        database.create_role_table()
 
         self.server = self.get_guild(secret["serverID"])
         self.category = self.get_channel(secret["gulagcategory"])
@@ -26,18 +24,18 @@ class GClient(discord.Client):
 
         await logger.log("Starting on server " + self.server.name)
 
+        pairs = []
         for mem in self.server.members:
             for role in mem.roles:
-                database.create_role_row(curr, mem.id, role.id)
+                pairs.append((mem.id, role.id))
+
+        database.create_role_rows(pairs)
 
         database.commit()
-        curr.close()
 
     async def on_member_join(self, member):
 
-        curr = database.get_cursor()
-
-        roles = database.get_roles(curr, member.id)
+        roles = database.get_roles(member.id)
 
         await logger.log("Member" + str(member.name) + " has joined, freezing")
 
@@ -50,7 +48,7 @@ class GClient(discord.Client):
                 role = self.server.get_role(int(i[0]))
                 await member.add_roles(role)
                 log += role.name + "\n"
-            except Exception as e:
+            except Exception:
                 pass
 
         await logger.log(log)
@@ -58,7 +56,6 @@ class GClient(discord.Client):
         database.commit()
         self.frozen_members.remove(member.id)
         await logger.log("Unfreezing member " + str(member.name))
-        curr.close()
 
     async def on_member_remove(self, member):
         await logger.log(member.name + " has left the server")
@@ -86,15 +83,9 @@ class GClient(discord.Client):
         if not new_roles and not old_roles:
             return
 
-        curr = database.get_cursor()
-        for i in new_roles:
-            database.create_role_row(curr, before.id, i.id)
+        database.create_role_rows([(before.id, x.id) for x in new_roles])
+        database.remove_role_row([(before.id, x.id) for x in old_roles])
 
-        curr = database.get_cursor()
-        for i in old_roles:
-            database.remove_role_row(curr, before.id, i.id)
-
-        curr.close()
         database.commit()
 
     async def remove_gulag(self, member):

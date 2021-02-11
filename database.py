@@ -16,7 +16,10 @@ def commit():
     return conn.commit()
 
 
-def create_role_table(curr):
+def create_role_table():
+
+    curr = get_cursor()
+
     curr.execute(
         """
         CREATE TABLE IF NOT EXISTS roles (
@@ -31,18 +34,34 @@ def create_role_table(curr):
         "DELETE FROM roles"
     )
 
+    curr.close()
 
-def create_role_row(curr, userid, roleid):
+
+def create_role_rows(pairs):
+    curr = get_cursor()
     # logger.log("Adding " + str(userid) + ", " + str(roleid))
-    curr.execute("INSERT INTO roles (userid, roleid) VALUES ({}, {})".format(userid, roleid))
+    for userid, roleid in pairs:
+        curr.execute("INSERT INTO roles (userid, roleid) VALUES ({}, {})".format(userid, roleid))
+
+    curr.close()
 
 
-def get_roles(curr, userid):
+def get_roles(userid):
     # logger.log("Getting roles for " + str(userid))
+    curr = get_cursor()
+
     curr.execute("SELECT roleid FROM roles WHERE userid={}".format(userid))
-    return curr.fetchall()
+
+    temp = curr.fetchall()
+    curr.close()
+    return temp
 
 
-def remove_role_row(curr, userid, roleid):
+def remove_role_row(pairs):
+    curr = get_cursor()
     # logger.log("Deleting " + str(userid) + ", " + str(roleid))
-    curr.execute("DELETE FROM roles WHERE userid={} AND roleid={}".format(userid, roleid))
+    for userid, roleid in pairs:
+        curr.execute("DELETE FROM roles WHERE userid={} AND roleid={}".format(userid, roleid))
+
+    curr.close()
+

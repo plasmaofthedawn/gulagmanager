@@ -1,7 +1,7 @@
 import json
 
 import discord
-import database
+from database import database
 import logger
 
 

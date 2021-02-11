@@ -1,8 +1,10 @@
 import json
+import os
+
 import psycopg2
 import MySQLdb
 
-details = json.load(open("secrets.json"))["database"]
+details = json.loads(os.environ.get('SECRETS'))["database"]
 
 
 class PostgreSQL:

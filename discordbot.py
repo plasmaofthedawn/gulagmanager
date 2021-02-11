@@ -1,4 +1,5 @@
 import json
+import os
 
 import discord
 from database import database
@@ -9,7 +10,7 @@ class GClient(discord.Client):
 
     async def on_ready(self):
 
-        secret = json.load(open("secrets.json"))
+        secret = json.loads(os.environ.get('SECRETS'))
 
         logger.log_channel = self.get_channel(secret["gulaglog"])
 

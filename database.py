@@ -2,7 +2,7 @@ import json
 import os
 
 import psycopg2
-import MySQLdb
+import mysql.connector
 
 details = json.loads(os.environ.get('SECRETS'))["database"]
 
@@ -69,8 +69,7 @@ class PostgreSQL:
 class MySQL:
 
     def __init__(self, credentials):
-        self.conn = MySQLdb.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
-                                    db=credentials["database"], ssl=False)
+        self.conn = mysql.connector.connect(**credentials)
 
     def get_cursor(self):
         return self.conn.cursor()

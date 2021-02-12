@@ -1,6 +1,6 @@
 import json
 import psycopg2
-import MySQLdb
+import mysql.connector
 
 details = json.load(open("secrets.json"))["database"]
 
@@ -67,7 +67,7 @@ class PostgreSQL:
 class MySQL:
 
     def __init__(self, credentials):
-        self.conn = MySQLdb.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
+        self.conn = mysql.connector.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
                                     db=credentials["database"])
 
     def get_cursor(self):

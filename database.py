@@ -70,7 +70,7 @@ class MySQL:
 
     def __init__(self, credentials):
         self.conn = MySQLdb.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
-                                    db=credentials["database"])
+                                    db=credentials["database"], ssl=False)
 
     def get_cursor(self):
         return self.conn.cursor()

@@ -69,7 +69,6 @@ class PostgreSQL:
 class MySQL:
 
     def __init__(self, credentials):
-        # logger.log('Connecting to the MySQL database...')
         self.conn = MySQLdb.connect(host=credentials["host"], user=credentials["user"], passwd=credentials["password"],
                                     db=credentials["database"])
 
@@ -100,15 +99,18 @@ class MySQL:
         curr.close()
 
     def create_role_rows(self, pairs):
-        curr = self.get_cursor()
-        # logger.log("Adding " + str(userid) + ", " + str(roleid))
-        for userid, roleid in pairs:
-            curr.execute("INSERT INTO roles (userid, roleid) VALUES ({}, {})".format(userid, roleid))
 
+        if not pairs:
+            return
+
+        curr = self.get_cursor()
+        # TODO: see if this cleans up the same in postgresql.
+        # i don't plan on using postgresql but it'll be neat to know for the future
+        curr.execute("INSERT INTO roles (userid, roleid) VALUES " +
+                     ", ".join(["({}, {})".format(userid, roleid) for userid, roleid in pairs]))
         curr.close()
 
     def get_roles(self, userid):
-        # logger.log("Getting roles for " + str(userid))
         curr = self.get_cursor()
 
         curr.execute("SELECT roleid FROM roles WHERE userid={}".format(userid))

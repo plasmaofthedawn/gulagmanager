@@ -69,8 +69,10 @@ class GClient(discord.Client):
 
         if new_roles:
             await logger.log("Adding roles " + " ".join([i.name for i in new_roles]) + " to " + before.name)
+            database.create_role_rows([(before.id, x.id) for x in new_roles])
         if old_roles:
             await logger.log("Removing roles " + " ".join([i.name for i in old_roles]) + " to " + before.name)
+            database.remove_role_row([(before.id, x.id) for x in old_roles])
 
         if self.gulagrole.id in [x.id for x in new_roles]:
             await self.create_gulag(before)
@@ -83,9 +85,6 @@ class GClient(discord.Client):
 
         if not new_roles and not old_roles:
             return
-
-        database.create_role_rows([(before.id, x.id) for x in new_roles])
-        database.remove_role_row([(before.id, x.id) for x in old_roles])
 
         database.commit()
 
